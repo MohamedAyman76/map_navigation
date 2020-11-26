@@ -29,9 +29,14 @@ def launch_nav_stack():
 
 def get_header():
     """
+    @author Mohamed
     @return: Header where frame_id='map' and stamp correctly filled
     @rtype: Header
     """
+    header = MoveBaseGoal()
+    header.target_pose.header.frame_id = "map"
+    header.target_pose.header.stamp = rospy.Time.now()
+    return header
 
 
 class Position:
@@ -156,11 +161,16 @@ class MapNavigation:
 
     def move_along_path(self, checkpoints, marking=True):
         """
+        @author Mohamed
         Moves robot along checkpoints and optionally marks the occupancy grid. Ends early if a checkpoint fails
         @type checkpoints:  List[Position]
         @param marking: True if the occupancy grid should be marked, False otherwise
         @type marking: bool
         """
+        goal = get_header()
+        for i in checkpoints:
+            goal.target_pose.pose.position = checkpoints[i]
+            self.action_client.send_goal(goal)
 
     def handle_amcl_pose(self, msg):
         """
